@@ -61,6 +61,15 @@ export default function FeedViewer({ feed }: { feed: ParsedFeed }) {
             </div>
           </div>
           <a
+            href="/"
+            className="text-sm text-gray-400 hover:text-gray-600 flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Load another
+          </a>
+          <a
             href={summary.shopLink}
             target="_blank"
             rel="noopener noreferrer"
