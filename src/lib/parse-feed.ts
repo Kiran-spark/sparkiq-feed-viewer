@@ -40,7 +40,12 @@ export interface ParsedFeed {
 
 function text(val: unknown): string {
   if (val === undefined || val === null) return "";
-  return String(val).replace(/^<!\[CDATA\[ ?(.*?) ?]]>$/, "$1").trim();
+  // fast-xml-parser stores CDATA as { __cdata: "value" }
+  if (typeof val === "object" && val !== null && "__cdata" in val) {
+    return String((val as Record<string, unknown>).__cdata ?? "").trim();
+  }
+  // Fallback: strip raw CDATA markers if present as plain string
+  return String(val).replace(/^<!\[CDATA\[\s*([\s\S]*?)\s*]]>$/, "$1").trim();
 }
 
 function toArray<T>(val: T | T[] | undefined): T[] {
@@ -63,7 +68,7 @@ export function parseFeedXml(xml: string): ParsedFeed {
   const rawItems: Record<string, unknown>[] = toArray(channel.item);
 
   const products: FeedProduct[] = rawItems.map((item) => {
-    const additionalImages = toArray(item["g:additional_image_link"] as string | string[]).map(text);
+    const additionalImages = toArray(item["g:additional_image_link"] as unknown[]).map(text);
 
     const priceRaw = text(item["g:price"]);
     const salePriceRaw = text(item["g:sale_price"]);
